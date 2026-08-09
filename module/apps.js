@@ -182,7 +182,7 @@ let apps = {
             catch (e) { return []; }
         },
         faviconOf: (url) => {
-            try { return 'https://favicon.im/' + new URL(url).hostname; }
+            try { return 'https://ico.la4.cn/ico.php?url=' + new URL(url).hostname; }
             catch (e) { return 'icon/edge.svg'; }
         },
         FAVICON_KEY: 'msstore_favicon',
