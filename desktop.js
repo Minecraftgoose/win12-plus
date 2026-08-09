@@ -823,7 +823,7 @@ let copilot = {
         content: '很好。现在开始与用户对话。'
     }, {
         role: 'assistant',
-        content: '欢迎使用 Windows 12 Copilot AI助手，有什么可以帮您？'
+        content: '欢迎使用 Windows 12 Copilot AI 助手，有什么可以帮您？'
     }],
     init: () => {
         $('#copilot>.chat').html('');
