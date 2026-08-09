@@ -1019,10 +1019,22 @@ input-before {
     font-size: 15px;
     display: flex;
     align-items: center;
+    /* flex 子项默认 min-width:auto，长文字会把行撑爆；置 0 让省略号生效 */
+    min-width: 0;
 }
 
 #startmenu-l>list>a>p {
     margin: 5px 0 5px 10px;
+    /* 长应用名强制单行，超长省略，避免 flex 行内折行破坏垂直对齐 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 通过 Store 安装进左侧文字列表的应用（mountApp 生成，带 enable 类） */
+#startmenu-l>list>a.enable {
+    color: var(--text);
+    cursor: default;
 }
 
 #startmenu-l>list>a>img {

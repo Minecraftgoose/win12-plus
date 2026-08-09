@@ -354,7 +354,7 @@ let apps = {
             document.body.insertAdjacentHTML('beforeend', winHtml);
             apps[id] = createWebapp(id, url);
             apps.msstore.bindWindowChrome(id);
-            const entry = `<a class="a sm-app enable ${id}" id="startapp-${id}" oncontextmenu="return showcm(event,'smlapp',['${id}','${apps.msstore.esc(name)}'])" onclick="openapp('${id}');hide_startmenu();"><img src="${favicon}" onerror="this.src='icon/edge.svg'"><p>${apps.msstore.esc(name)}</p></a>`;
+            const entry = `<a class="a enable ${id}" id="startapp-${id}" oncontextmenu="return showcm(event,'smlapp',['${id}','${apps.msstore.esc(name)}'])" onclick="openapp('${id}');hide_startmenu();"><img src="${favicon}" onerror="this.src='icon/edge.svg'"><p>${apps.msstore.esc(name)}</p></a>`;
             // 刷新恢复或重装时清理旧的开始菜单条目，避免残留无 class 的版本造成图标过宽
             $('#startapp-' + id).remove();
             const anchor = $('#start-menu a[onclick*="openapp(\'msstore\')"]');
