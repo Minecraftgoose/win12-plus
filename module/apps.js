@@ -129,7 +129,6 @@ let apps = {
         CATALOG: {
             baidu:    { name: '百度',       url: 'https://www.baidu.com',      desc: '百度一下，你就知道',     cate: '工具', cat: 'app' },
             bilibili: { name: '哔哩哔哩',   url: 'https://www.bilibili.com',   desc: '弹幕视频社区',           cate: '视频', cat: 'app' },
-            github:   { name: 'GitHub',     url: 'https://github.com',         desc: '全球开发者社区',         cate: '开发', cat: 'app' },
             youtube:  { name: 'YouTube',    url: 'https://www.youtube.com',    desc: '视频分享平台',           cate: '视频', cat: 'app' },
             taobao:   { name: '淘宝',       url: 'https://www.taobao.com',     desc: '淘！我喜欢',             cate: '购物', cat: 'app' },
             jd:       { name: '京东',       url: 'https://www.jd.com',         desc: '多快好省',               cate: '购物', cat: 'app' },
