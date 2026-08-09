@@ -98,7 +98,7 @@ Concernant la feuille de route de ce projet :
 - [x] Améliorer les widgets, ajouter la fonctionnalité d'intégration au bureau
 - [x] Fond d'écran dynamique
 - [ ] Plus de personnalisation de la barre des tâches
-- [ ] Enrichir l'écosystème d'applications, ajouter Microsoft Store
+- [x] Enrichir l'écosystème d'applications, ajouter Microsoft Store
 - [ ] Améliorer les Paramètres et Windows Update
 
 Voici quelques... euh... rêvasseries `~o~)/` :

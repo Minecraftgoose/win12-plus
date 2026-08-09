@@ -114,7 +114,7 @@ Regarding the roadmap for this project:
 - [x] Improve widgets and add desktop widget functionality
 - [x] Dynamic wallpaper
 - [ ] More taskbar customization
-- [ ] Enrich app ecosystem, add Microsoft Store
+- [x] Enrich app ecosystem, add Microsoft Store
 - [ ] Improve Settings and Windows Update
 
 Here are some... uh... wild... ideas `~o~)/`:

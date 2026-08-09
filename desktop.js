@@ -70,7 +70,7 @@ document.querySelectorAll('list.focs').forEach(li => {
     li.addEventListener('click', () => {
         let _ = li.$$('span.focs')[0], la = li.$$('a.check')[0],
             las = li.$$('a');
-        if (_.dataset.type == 'abs') {
+        if (_ && _.dataset.type == 'abs') {
             $(_).addClass('cl');
             $(_).css('top', (la.getBoundingClientRect().top - li.parentElement.getBoundingClientRect().top) + 'px');
             setTimeout(() => {
@@ -1048,6 +1048,8 @@ function syncTaskbarLayout() {
     $('#taskbar').css('width', 4 + count * (34 + 4));
 }
 
+var winCascade = { x: 0, y: 0 };
+
 function openapp(name) {
     if (taskmgrTasks.findIndex(elt => elt.link == name) > -1 && apps.taskmgr.tasks.findIndex(elt => elt.link == name) == -1) {
         apps.taskmgr.tasks.splice(apps.taskmgr.tasks.length, 0, taskmgrTasks.find(elt => elt.link == name));
@@ -1060,8 +1062,12 @@ function openapp(name) {
         return;
     }
     $('.window.' + name).addClass('load');
+    winCascade.x = (winCascade.x + 3) % 33;
+    winCascade.y = (winCascade.y + 3) % 33;
     showwin(name);
-    $('#taskbar').append(`<a class="${name}" onclick="taskbarclick('${name}\')" win12_title="${$(`.window.${name}>.titbar>p`).text()}" onmouseenter="showdescp(event)" onmouseleave="hidedescp(event)" oncontextmenu="return showcm(event, 'taskbar', '${name}')"><img src="icon/${icon[name] || (name + '.svg')}"></a>`);
+    const ic = icon[name] || (name + '.svg');
+    const icSrc = /^(https?:|data:)/.test(ic) ? ic : 'icon/' + ic;
+    $('#taskbar').append(`<a class="${name}" onclick="taskbarclick('${name}\')" win12_title="${$(`.window.${name}>.titbar>p`).text()}" onmouseenter="showdescp(event)" onmouseleave="hidedescp(event)" oncontextmenu="return showcm(event, 'taskbar', '${name}')"><img src="${icSrc}" onerror="this.src='icon/edge.svg'"></a>`);
     syncTaskbarLayout();
     $('#taskbar>.' + name).addClass('foc');
     setTimeout(() => {
@@ -1726,6 +1732,7 @@ function win12Start() {
         }
     }, 750);
     apps.webapps.init();
+    apps.msstore.restore();
     initLoginPassword();
     //getdata
     if (localStorage.getItem('theme') == 'dark') {
@@ -1791,7 +1798,8 @@ function win12Start() {
     });
     document.querySelectorAll('.window>div.resize-bar').forEach(w => {
         for (const n of ['top', 'bottom', 'left', 'right', 'top-right', 'top-left', 'bottom-right', 'bottom-left']) {
-            w.insertAdjacentHTML('afterbegin', `<div class="resize-knob ${n}" onmousedown="resizewin(this.parentElement.parentElement, '${n}', this)"></div>`);
+            // 触屏：八个方向手柄以 touch 事件触发，并阻止随后派发的合成鼠标事件
+            w.insertAdjacentHTML('afterbegin', `<div class="resize-knob ${n}" onmousedown="resizewin(this.parentElement.parentElement, '${n}', this)" ontouchstart="event.preventDefault(); resizewin(this.parentElement.parentElement, '${n}', this)"></div>`);
         }
     });
     $.getJSON('https://tjy-gitnub.github.io/win12-theme/def.json').then(j => {

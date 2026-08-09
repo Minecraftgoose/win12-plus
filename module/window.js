@@ -7,7 +7,7 @@ function showwin(name) {
     setTimeout(() => { $('.window.' + name).addClass('show'); }, 0);
     setTimeout(() => { $('.window.' + name).addClass('notrans'); }, 200);
     if (name != 'run') {
-        $('.window.' + name).attr('style', 'top: 10%;left: 15%;');
+        $('.window.' + name).attr('style', 'top: calc(10% + ' + winCascade.y + 'px);left: calc(15% + ' + winCascade.x + 'px);');
     }
     focwin(name);
     if (!$('#start-menu.show')[0] && !$('#search-win.show')[0] && !$('#widgets.show')[0] && !$('#control.show')[0] && !$('#datebox.show')[0]) {
@@ -442,6 +442,10 @@ for (let i = 0; i < wins.length; i++) {
         page.onmousemove = win_move.bind(win);
     });
     titbar.addEventListener('touchstart', (e) => {
+        // 命中标题栏按钮/图标时放过，不拦截、不拖拽，让 click 正常派发
+        // （touchstart 上的 preventDefault 会吞掉合成 click，导致右上角按钮在移动端点不动）
+        if (e.target.closest('.wbtg') || e.target.closest('.icon') || e.target.closest('.titbar>div')) return;
+        if (e.cancelable) e.preventDefault();
         let x = window.getComputedStyle(win, null).getPropertyValue('left').split('px')[0];
         let y = window.getComputedStyle(win, null).getPropertyValue('top').split('px')[0];
         if (y != 0) {

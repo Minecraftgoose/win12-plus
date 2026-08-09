@@ -123,8 +123,32 @@ let apps = {
         },
     },
     msstore: {
+        STORE_KEY: 'msstore_installed',
+        CUSTOM_KEY: 'msstore_custom',
+        // 推荐网页应用目录（参考网页版 App Store 的 catalog 结构）
+        CATALOG: {
+            baidu:    { name: '百度',       url: 'https://www.baidu.com',      desc: '百度一下，你就知道',     cate: '工具', cat: 'app' },
+            bilibili: { name: '哔哩哔哩',   url: 'https://www.bilibili.com',   desc: '弹幕视频社区',           cate: '视频', cat: 'app' },
+            github:   { name: 'GitHub',     url: 'https://github.com',         desc: '全球开发者社区',         cate: '开发', cat: 'app' },
+            youtube:  { name: 'YouTube',    url: 'https://www.youtube.com',    desc: '视频分享平台',           cate: '视频', cat: 'app' },
+            taobao:   { name: '淘宝',       url: 'https://www.taobao.com',     desc: '淘！我喜欢',             cate: '购物', cat: 'app' },
+            jd:       { name: '京东',       url: 'https://www.jd.com',         desc: '多快好省',               cate: '购物', cat: 'app' },
+            weibo:    { name: '微博',       url: 'https://weibo.com',          desc: '随时随地发现新鲜事',     cate: '社交', cat: 'app' },
+            zhihu:    { name: '知乎',       url: 'https://www.zhihu.com',      desc: '有问题，上知乎',         cate: '社交', cat: 'app' },
+            wangyiyun:{ name: '网易云音乐', url: 'https://music.163.com',      desc: '音乐社区',               cate: '音乐', cat: 'app' },
+            g_genshin:{ name: '原神',       url: 'https://ys.mihoyo.com',      desc: '开放世界冒险',           cate: '游戏', cat: 'game' },
+            g_minecraft:{ name: '我的世界', url: 'https://mcjs.cc',  desc: '沙盒建造游戏',           cate: '游戏', cat: 'game' },
+            g_start:  { name: 'Start 云游戏', url: 'https://start.qq.com',     desc: '云端畅玩大作',           cate: '游戏', cat: 'game' },
+            macos_web:{ name: 'macOS 网页版', url: 'https://macos.goose.cc.cd', desc: '浏览器里的 macOS 体验',   cate: '系统', cat: 'app' },
+            goosehost:{ name: 'GooseHost',    url: 'https://host.goose.gs.cn',  desc: '静态网站托管服务',       cate: '开发', cat: 'app' }
+        },
         init: () => {
-            $('#win-msstore>.menu>list>a.home')[0].click();
+            apps.msstore.page('home');
+            if (!apps.msstore.initialized) {
+                apps.msstore.initialized = true;
+                apps.msstore.renderLists();
+                apps.msstore.primeAll();
+            }
         },
         page: (name) => {
             $('#win-msstore>.page>.cnt.' + name).scrollTop(0);
@@ -132,6 +156,324 @@ let apps = {
             $('#win-msstore>.page>.cnt.' + name).addClass('show');
             $('#win-msstore>.menu>list>a.check').removeClass('check');
             $('#win-msstore>.menu>list>a.' + name).addClass('check');
+            // 侧栏指示器 span.focs 跟随激活项；通用 click 处理器只在用户点击时移动，
+            // init/外部调用 page 时需主动同步，避免竖条停在初始位置（紧贴末项）
+            const list = $('#win-msstore>.menu>list.focs')[0];
+            if (list) {
+                const ind = list.$$('span.focs')[0];
+                const act = list.$$('a.' + name)[0];
+                if (ind && act && !ind.dataset.type) {
+                    const last = list.$$('a');
+                    $(ind).addClass('cl');
+                    $(ind).css('top', act.offsetTop - last[last.length - 1].offsetTop + 'px');
+                    $(ind).css('left', act.offsetLeft - list.offsetLeft + 'px');
+                    setTimeout(() => { $(ind).removeClass('cl'); }, 500);
+                }
+            }
+            if (name === 'apps' || name === 'game') apps.msstore.renderLists();
+            if (name === 'down') apps.msstore.renderDown();
+            if (name === 'home') apps.msstore.renderHome();
+        },
+        getInstalled: () => {
+            try { return JSON.parse(localStorage.getItem(apps.msstore.STORE_KEY) || '[]'); }
+            catch (e) { return []; }
+        },
+        getCustom: () => {
+            try { return JSON.parse(localStorage.getItem(apps.msstore.CUSTOM_KEY) || '[]'); }
+            catch (e) { return []; }
+        },
+        faviconOf: (url) => {
+            try { return 'https://favicon.im/' + new URL(url).hostname; }
+            catch (e) { return 'icon/edge.svg'; }
+        },
+        FAVICON_KEY: 'msstore_favicon',
+        // 读取 favicon 缓存：localStorage 中的 url → dataUri 映射；写入失败时返回空对象
+        readFaviconCache: () => {
+            try { return JSON.parse(localStorage.getItem(apps.msstore.FAVICON_KEY) || '{}'); }
+            catch (e) { return {}; }
+        },
+        writeFaviconCache: (cache) => {
+            try { localStorage.setItem(apps.msstore.FAVICON_KEY, JSON.stringify(cache)); }
+            catch (e) { /* localStorage 容量超限或被禁，忽略 */ }
+        },
+        // 同步取 favicon 资源：命中返回缓存（data URI 或 url），未命中返回推导地址
+        getFavicon: (url) => {
+            if (!url) return 'icon/edge.svg';
+            const c = apps.msstore.readFaviconCache();
+            if (c[url] && c[url] !== '__PENDING__') {
+                if (c[url] === '__FAIL__') return apps.msstore.faviconOf(url);
+                return c[url];
+            }
+            return apps.msstore.faviconOf(url);
+        },
+        // 异步把远端 favicon 探针并转 data URI 缓存：成功则替换为 data URI；跨域或失败标 FAIL
+        primeFavicon: (url) => {
+            if (!url) return;
+            const cache = apps.msstore.readFaviconCache();
+            if (cache[url]) return;
+            cache[url] = '__PENDING__';
+            apps.msstore.writeFaviconCache(cache);
+            const probeUrl = apps.msstore.faviconOf(url);
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            const finalize = (val) => {
+                const c2 = apps.msstore.readFaviconCache();
+                c2[url] = val;
+                apps.msstore.writeFaviconCache(c2);
+            };
+            img.onload = () => {
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = img.naturalWidth || 16;
+                    c.height = img.naturalHeight || 16;
+                    c.getContext('2d').drawImage(img, 0, 0);
+                    finalize(c.toDataURL('image/png'));
+                } catch (e) {
+                    finalize('__FAIL__');
+                }
+            };
+            img.onerror = () => finalize('__FAIL__');
+            img.src = probeUrl;
+        },
+        // 预热整个目录与已装应用的 favicon；初次开 store 后台跑一遍
+        primeAll: () => {
+            for (const id in apps.msstore.CATALOG) {
+                const a = apps.msstore.CATALOG[id];
+                if (a && a.url) apps.msstore.primeFavicon(a.url);
+            }
+            apps.msstore.getInstalled().forEach(id => {
+                const a = apps.msstore.CATALOG[id] || apps.msstore.getCustom().find(x => x.id === id);
+                if (a && a.url) apps.msstore.primeFavicon(a.url);
+            });
+        },
+        isInstalled: (id) => apps.msstore.getInstalled().includes(id),
+        esc: (s) => String(s).replace(/[&<>'"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[m])),
+        listHtml: (cat) => {
+            let html = '<div class="store-grid">';
+            for (const id in apps.msstore.CATALOG) {
+                const a = apps.msstore.CATALOG[id];
+                if (a.cat !== cat) continue;
+                html += apps.msstore.cardHtml(id, a, apps.msstore.isInstalled(id));
+            }
+            html += '</div>';
+            return html;
+        },
+        cardHtml: (id, a, installed) => {
+            const fav = apps.msstore.getFavicon(a.url);
+            const act = installed
+                ? `<button class="open" onclick="apps.msstore.openApp('${id}')">打开</button><button class="get" onclick="apps.msstore.uninstall('${id}')">卸载</button>`
+                : `<button class="get" onclick="apps.msstore.install('${id}')">获取</button>`;
+            return `<div class="store-card" data-id="${id}">
+                <img class="store-card-icon" src="${fav}" onerror="this.src='icon/edge.svg'">
+                <div class="store-card-info">
+                    <div class="store-card-name">${apps.msstore.esc(a.name)}</div>
+                    <div class="store-card-desc">${apps.msstore.esc(a.desc)}</div>
+                    <div class="store-card-cate">${apps.msstore.esc(a.cate)}</div>
+                </div>
+                <div class="store-card-act">${act}</div>
+            </div>`;
+        },
+        renderLists: () => {
+            const appsList = $('#win-msstore>.page>.cnt.apps');
+            const gameList = $('#win-msstore>.page>.cnt.game');
+            if (appsList.length) appsList.html(apps.msstore.listHtml('app'));
+            if (gameList.length) gameList.html(apps.msstore.listHtml('game'));
+        },
+        renderHome: () => {
+            const box = $('#win-msstore>.page>.cnt.home>.container>.store-home-section>.store-featured');
+            if (!box.length) return;
+            let html = '';
+            let n = 0;
+            for (const id in apps.msstore.CATALOG) {
+                const a = apps.msstore.CATALOG[id];
+                if (a.cat !== 'app' && a.cat !== 'game') continue;
+                if (n >= 8) break;
+                html += apps.msstore.cardHtml(id, a, apps.msstore.isInstalled(id));
+                n++;
+            }
+            box.html(html);
+        },
+        install: (id, isCustom) => {
+            const a = isCustom ? apps.msstore.getCustom().find(x => x.id === id) : apps.msstore.CATALOG[id];
+            if (!a || apps.msstore.isInstalled(id)) return;
+            const card = $(`#win-msstore .store-card[data-id="${id}"]`);
+            if (card.length) card.find('.store-card-act').html('<span class="installing">安装中…</span>');
+            const fav = apps.msstore.getFavicon(a.url);
+            let prog = 0;
+            const timer = setInterval(() => {
+                prog = Math.min(100, prog + 12);
+                if (card.length) card.find('.installing').text(`安装中… ${prog}%`);
+                if (prog >= 100) {
+                    clearInterval(timer);
+                    apps.msstore.mountApp(id, a.url, a.name, fav, isCustom);
+                    const installed = apps.msstore.getInstalled();
+                    installed.push(id);
+                    localStorage.setItem(apps.msstore.STORE_KEY, JSON.stringify(installed));
+                    if (isCustom) {
+                        const cs = apps.msstore.getCustom();
+                        const c = cs.find(x => x.id === id);
+                        if (c) c.installed = true;
+                        localStorage.setItem(apps.msstore.CUSTOM_KEY, JSON.stringify(cs));
+                    }
+                    apps.msstore.renderLists();
+                    apps.msstore.renderDown();
+                }
+            }, 120);
+        },
+        uninstall: (id) => {
+            apps.msstore.unmountApp(id);
+            let installed = apps.msstore.getInstalled();
+            installed = installed.filter(x => x !== id);
+            localStorage.setItem(apps.msstore.STORE_KEY, JSON.stringify(installed));
+            const cs = apps.msstore.getCustom();
+            const c = cs.find(x => x.id === id);
+            if (c) c.installed = false;
+            localStorage.setItem(apps.msstore.CUSTOM_KEY, JSON.stringify(cs));
+            apps.msstore.renderLists();
+            apps.msstore.renderDown();
+        },
+        openApp: (id) => { openapp(id); },
+        mountApp: (id, url, name, fav, isCustom) => {
+            const favicon = fav || apps.msstore.getFavicon(url);
+            icon[id] = favicon;
+            if ($('.window.' + id).length) return;
+            const winHtml = `<div class="window ${id} webapp">
+                <div class="resize-bar"></div>
+                <div class="titbar">
+                    <img src="${favicon}" class="icon" onerror="this.src='icon/edge.svg'">
+                    <p>${apps.msstore.esc(name)}</p>
+                    <div>
+                        <a class="a wbtg red" onclick="hidewin('${id}')"><i class="bi bi-x-lg"></i></a>
+                        <a class="a wbtg max" onclick="maxwin('${id}')"><i class="bi bi-app"></i></a>
+                        <a class="a wbtg" onclick="minwin('${id}')"><i class="bi bi-dash-lg"></i></a>
+                    </div>
+                </div>
+                <div class="loadback"><img src="${favicon}" class="icon" onerror="this.src='icon/edge.svg'"></div>
+                <div class="content" id="win-${id}"></div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', winHtml);
+            apps[id] = createWebapp(id, url);
+            apps.msstore.bindWindowChrome(id);
+            const entry = `<a class="a sm-app enable ${id}" id="startapp-${id}" oncontextmenu="return showcm(event,'smlapp',['${id}','${apps.msstore.esc(name)}'])" onclick="openapp('${id}');hide_startmenu();"><img src="${favicon}" onerror="this.src='icon/edge.svg'"><p>${apps.msstore.esc(name)}</p></a>`;
+            // 刷新恢复或重装时清理旧的开始菜单条目，避免残留无 class 的版本造成图标过宽
+            $('#startapp-' + id).remove();
+            const anchor = $('#start-menu a[onclick*="openapp(\'msstore\')"]');
+            if (anchor.length) anchor.after(entry);
+            apps.msstore.mountDesktop(id, name, favicon);
+        },
+        mountDesktop: (id, name, favicon) => {
+            // 桌面图标：与开始菜单条目对应，安装时落地、卸载时移除
+            if ($('#desktop>div[appname="' + id + '"]').length) return;
+            if (desktopItem.some(x => x.indexOf("appname='" + id + "'") > -1)) return;
+            const s = `<div class="b" ondblclick="openapp('${id}')" ontouchstart="openapp('${id}')" appname='${id}'><img src="${favicon}" onerror="this.src='icon/edge.svg'"><p>${apps.msstore.esc(name)}</p></div>`;
+            $('#desktop').append(s);
+            desktopItem[desktopItem.length] = s;
+            addMenu();
+            saveDesktop();
+        },
+        unmountDesktop: (id) => {
+            $('#desktop>div[appname="' + id + '"]').remove();
+            const i = desktopItem.findIndex(x => x.indexOf("appname='" + id + "'") > -1);
+            if (i > -1) { desktopItem.splice(i, 1); saveDesktop(); }
+        },
+        bindWindowChrome: (id) => {
+            // 运行时动态创建的窗口：补上解析期绑定过的窗口外壳行为
+            // （窗口拖动、八个方向缩放、双击标题栏最大化、点击聚焦、标题栏按钮不触发拖拽）
+            const win = $('.window.' + id);
+            if (!win.length) return;
+            const titbar = win.children('.titbar');
+            const resizeBar = win.children('.resize-bar');
+            win.attr('onmousedown', `focwin('${id}')`);
+            win.attr('ontouchstart', `focwin('${id}')`);
+            titbar.attr('oncontextmenu', `return showcm(event,'titbar','${id}')`);
+            titbar.attr('ondblclick', `maxwin('${id}')`);
+            titbar.children('div').children('.wbtg').mousedown(stop);
+            titbar.children('.icon').mousedown(stop);
+            const winEl = win[0];
+            const tbEl = titbar[0];
+            tbEl.addEventListener('mousedown', (e) => {
+                if ($('.taskmgr>.titbar>div>input').is(':focus')) return;
+                let x = window.getComputedStyle(winEl, null).getPropertyValue('left').split('px')[0];
+                let y = window.getComputedStyle(winEl, null).getPropertyValue('top').split('px')[0];
+                if (y != 0) { bfLeft = x; bfTop = y; }
+                deltaLeft = e.clientX - x;
+                deltaTop = e.clientY - y;
+                page.onmousemove = win_move.bind(winEl);
+            });
+            tbEl.addEventListener('touchstart', (e) => {
+                // 命中标题栏按钮/图标时放过，不拦截、不拖拽，让 click 正常派发
+                // （touchstart 上的 preventDefault 会吞掉合成 click，导致右上角按钮在移动端点不动）
+                if (e.target.closest('.wbtg') || e.target.closest('.icon') || e.target.closest('.titbar>div')) return;
+                if (e.cancelable) e.preventDefault();
+                let x = window.getComputedStyle(winEl, null).getPropertyValue('left').split('px')[0];
+                let y = window.getComputedStyle(winEl, null).getPropertyValue('top').split('px')[0];
+                if (y != 0) { bfLeft = x; bfTop = y; }
+                deltaLeft = e.targetTouches[0].clientX - x;
+                deltaTop = e.targetTouches[0].clientY - y;
+                page.ontouchmove = win_move.bind(winEl);
+            });
+            if (resizeBar.length) {
+                for (const n of ['top', 'bottom', 'left', 'right', 'top-right', 'top-left', 'bottom-right', 'bottom-left']) {
+                    resizeBar[0].insertAdjacentHTML('afterbegin', `<div class="resize-knob ${n}" onmousedown="resizewin(this.parentElement.parentElement, '${n}', this)" ontouchstart="event.preventDefault(); resizewin(this.parentElement.parentElement, '${n}', this)"></div>`);
+                }
+            }
+        },
+        unmountApp: (id) => {
+            apps.msstore.unmountDesktop(id);
+            hidewin(id);
+            $('.window.' + id).remove();
+            delete apps[id];
+            if (icon[id]) delete icon[id];
+            $('#startapp-' + id).remove();
+        },
+        renderDown: () => {
+            const cont = $('#win-msstore>.page>.cnt.down .installed-list');
+            if (!cont.length) return;
+            const installed = apps.msstore.getInstalled();
+            let html = '';
+            installed.forEach(id => {
+                const a = apps.msstore.CATALOG[id] || apps.msstore.getCustom().find(x => x.id === id);
+                if (!a) return;
+                const fav = apps.msstore.getFavicon(a.url);
+                html += `<div class="store-card" data-id="${id}">
+                    <img class="store-card-icon" src="${fav}" onerror="this.src='icon/edge.svg'">
+                    <div class="store-card-info">
+                        <div class="store-card-name">${apps.msstore.esc(a.name)}</div>
+                        <div class="store-card-desc">${apps.msstore.esc(a.desc)}</div>
+                    </div>
+                    <div class="store-card-act">
+                        <button class="open" onclick="apps.msstore.openApp('${id}')">打开</button>
+                        <button class="get" onclick="apps.msstore.uninstall('${id}')">卸载</button>
+                    </div>
+                </div>`;
+            });
+            cont.html(html || '<div class="store-empty">暂无已安装的应用</div>');
+        },
+        makeCustom: () => {
+            const name = $('#msstore-custom-name').val().trim();
+            const url = $('#msstore-custom-url').val().trim();
+            if (!name) { alert('请输入应用名称'); return; }
+            if (!/^https?:\/\//i.test(url)) { alert('请输入以 http:// 或 https:// 开头的网址'); return; }
+            const id = 'custom_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+            const cs = apps.msstore.getCustom();
+            cs.push({ id: id, name: name, url: url, installed: false });
+            localStorage.setItem(apps.msstore.CUSTOM_KEY, JSON.stringify(cs));
+            $('#msstore-custom-name').val('');
+            $('#msstore-custom-url').val('');
+            apps.msstore.install(id, true);
+        },
+        toggleCustom: () => {
+            // 自定义表单默认收起，由标题栏入口呼出
+            apps.msstore.page('down');
+            const box = $('#win-msstore .custom-apps');
+            if (box.length) box.toggleClass('show');
+        },
+        restore: () => {
+            apps.msstore.getInstalled().forEach(id => {
+                const a = apps.msstore.CATALOG[id] || apps.msstore.getCustom().find(x => x.id === id);
+                if (!a) return;
+                apps.msstore.mountApp(id, a.url, a.name, apps.msstore.getFavicon(a.url), !!apps.msstore.getCustom().find(x => x.id === id));
+            });
         }
     },
     run: {

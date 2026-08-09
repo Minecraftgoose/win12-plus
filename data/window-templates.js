@@ -250,6 +250,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 				<a class="a wbtg red" onclick="hidewin('msstore');"><i class="bi bi-x-lg"></i></a>
 				<a class="a wbtg max" onclick="maxwin('msstore')"><i class="bi bi-app"></i></a>
 				<a class="a wbtg" onclick="minwin('msstore')"><i class="bi bi-dash-lg"></i></a>
+				<a class="a wbtg custom-entry" onclick="apps.msstore.toggleCustom()" win12_title="自定义应用"><i class="bi bi-plus-lg"></i></a>
 			</div>
 		</div>
 		<div class="loadback" data-delay="3500">
@@ -275,107 +276,31 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 			<div class="page">
 				<div class="cnt home show">
 					<div class="container">
-						<div class="cards"></div>
-						<div class="apps">
-							<div class="tit" data-i18n="msstore.topfree">热门免费应用 ></div>
-							<div class="app-cards">
-								<div class="card1">
-									<div class="left"></div>
-									<div class="right">
-										<div class="tit">
-											<div class="up">
-												<div class="name">Visual Studio Code</div>
-												<div class="type" data-i18n="msstore.free">免费下载</div>
-											</div>
-											<div class="down">
-												<div class="rating"></div>
-												<div class="cate" data-i18n="msstore.devtool">开发</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="card2">
-									<div class="left"></div>
-									<div class="right">
-										<div class="tit">
-											<div class="up">
-												<div class="name" data-i18n="msstore.genimp">原神</div>
-												<div class="type" data-i18n="msstore.free">免费下载</div>
-											</div>
-											<div class="down">
-												<div class="rating"></div>
-												<div class="cate" data-i18n="msstore.game">游戏</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="card3">
-									<div class="left"></div>
-									<div class="right">
-										<div class="tit">
-											<div class="up">
-												<div class="name" data-i18n="msstore.mc">我的世界</div>
-												<div class="type" data-i18n="msstore.free">免费下载</div>
-											</div>
-											<div class="down">
-												<div class="rating"></div>
-												<div class="cate" data-i18n="msstore.game">游戏</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="card4">
-									<div class="left"></div>
-									<div class="right">
-										<div class="tit">
-											<div class="up">
-												<div class="name">Krita</div>
-												<div class="type" data-i18n="msstore.free">免费下载</div>
-											</div>
-											<div class="down">
-												<div class="rating"></div>
-												<div class="cate" data-i18n="msstore.design">设计</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="card5">
-									<div class="left"></div>
-									<div class="right">
-										<div class="tit">
-											<div class="up">
-												<div class="name">VirtualBox</div>
-												<div class="type" data-i18n="msstore.free">免费下载</div>
-											</div>
-											<div class="down">
-												<div class="rating"></div>
-												<div class="cate" data-i18n="msstore.tool">工具</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="card6">
-									<div class="left"></div>
-									<div class="right">
-										<div class="tit">
-											<div class="up">
-												<div class="name">LibreOffice</div>
-												<div class="type" data-i18n="msstore.free">免费下载</div>
-											</div>
-											<div class="down">
-												<div class="rating"></div>
-												<div class="cate" data-i18n="msstore.business">办公</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+						<div class="store-hero">
+							<div class="store-hero-kicker">Microsoft Store</div>
+							<div class="store-hero-title">发现好用的网页应用</div>
+							<div class="store-hero-sub">精选内置应用，点一下即可安装到桌面</div>
+						</div>
+						<div class="store-home-section">
+							<div class="store-home-section-tit">热门免费应用<span class="store-home-more" onclick="apps.msstore.page('apps')">查看全部 ›</span></div>
+							<div class="store-featured"></div>
 						</div>
 					</div>
 				</div>
 				<div class="cnt apps"></div>
 				<div class="cnt game"></div>
-				<div class="cnt down"></div>
+				<div class="cnt down">
+				<div class="custom-apps">
+					<div class="tit">自定义应用</div>
+					<div class="custom-form">
+						<input type="text" id="msstore-custom-name" placeholder="应用名称">
+						<input type="text" id="msstore-custom-url" placeholder="网址，例如 https://example.com">
+						<button onclick="apps.msstore.makeCustom()">存入商店</button>
+					</div>
+				</div>
+				<div class="tit" data-i18n="msstore.installed">已安装</div>
+				<div class="installed-list"></div>
+			</div>
 			</div>
 		</div>
 	</div>
@@ -2320,6 +2245,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 					<list class="focs">
 						<a class="back" onclick="apps.word.edit()"><i class="bi bi-arrow-left-circle"></i></a>
 						<a class="home check"><icon class="office-icon"></icon><span class="t2" data-i18n="home">首页</span></a>
+						<span class="focs"></span>
 					</list>
 				</div>
 				<div class="app-main">

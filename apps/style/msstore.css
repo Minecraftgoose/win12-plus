@@ -6,6 +6,7 @@
 #win-msstore {
     display: grid;
     grid-template-columns: 80px auto;
+    grid-template-rows: 1fr;
 
     & icon {
         font-family: StoreIcons;
@@ -80,6 +81,8 @@
     &>.page {
         background-color: var(--bg50);
         border-radius: 10px 0px 0px 0px;
+        overflow: hidden;
+        min-height: 0;
 
         &>.cnt {
             transition: transform 400ms cubic-bezier(0.05, 0.96, 0.11, 1), opacity 300ms, height 0ms;
@@ -100,106 +103,84 @@
             &.home {
                 &>.container {
                     height: 100%;
-                    display: grid;
-                    grid-template-rows: auto min-content;
-                    padding: 0px 15px 30px 15px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 18px;
+                    padding: 16px 18px 30px 18px;
 
-                    &>.apps {
-                        &>.tit {
-                            margin-left: 30px;
-                            font-size: 1.6em;
-                            line-height: 1.5;
+                    &>.store-hero {
+                        position: relative;
+                        flex: 0 0 auto;
+                        border-radius: var(--radius-2xl);
+                        padding: 26px 28px;
+                        color: #fff;
+                        overflow: hidden;
+                        background-image: linear-gradient(120deg, var(--theme-1), var(--theme-2));
+                        box-shadow: 0 8px 24px var(--s3d);
+
+                        &::after {
+                            content: "";
+                            position: absolute;
+                            right: -50px;
+                            top: -50px;
+                            width: 200px;
+                            height: 200px;
+                            border-radius: 50%;
+                            background: rgba(255, 255, 255, 0.18);
+                            filter: blur(6px);
                         }
 
-                        &>.app-cards {
-                            display: grid;
-                            grid-template-columns: auto auto auto;
-                            grid-template-rows: auto auto auto;
+                        &>.store-hero-kicker {
+                            font-size: 0.78em;
+                            letter-spacing: 0.08em;
+                            text-transform: uppercase;
+                            opacity: 0.85;
+                        }
 
-                            &>* {
-                                background-color: var(--hover);
-                                margin: 10px;
-                                border-radius: var(--radius-2xl);
-                                padding: 14px;
-                                display: flex; 
+                        &>.store-hero-title {
+                            margin: 6px 0 4px;
+                            font-size: 1.7em;
+                            font-weight: 700;
+                            line-height: 1.2;
+                        }
 
-                                &>.left {
-                                    width: 70px;
-                                    height: 70px;
-                                    flex: 0 0 70px;
-                                    margin-right: 16px;
-                                    border-radius: 12px;
-                                    background-color: var(--fill);
-                                    background-position: center;
-                                    background-repeat: no-repeat;
-                                    background-size: cover;
-                                    box-shadow: 0 2px 8px var(--s3d);
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    overflow: hidden;
-                                }
+                        &>.store-hero-sub {
+                            margin: 0;
+                            font-size: 0.92em;
+                            opacity: 0.9;
+                        }
+                    }
 
-                                &>.left::before {
-                                    color: #fff;
-                                    font-size: 22px;
-                                    font-weight: 600;
-                                    line-height: 1;
-                                }
+                    &>.store-home-section {
+                        flex: 1 1 auto;
+                        min-height: 0;
+                        display: flex;
+                        flex-direction: column;
 
-                                &.card1>.left {
-                                    background-color: #1f1f1f;
-                                    background-image: url("../../icon/vscode.png");
-                                    background-size: 58px 58px;
-                                }
+                        &>.store-home-section-tit {
+                            display: flex;
+                            align-items: baseline;
+                            justify-content: space-between;
+                            margin: 4px 6px 12px;
+                            font-size: 1.25em;
+                            font-weight: 600;
 
-                                &.card2>.left {
-                                    background-image: url("https://bkimg.cdn.bcebos.com/pic/024f78f0f736afc37206d596bd19ebc4b745123e?x-bce-process=image/format,f_auto/quality,Q_70/resize,m_lfit,limit_1,w_536");
-                                }
+                            &>.store-home-more {
+                                font-size: 0.58em;
+                                font-weight: 400;
+                                color: var(--text2);
+                                cursor: pointer;
 
-                                &.card3>.left {
-                                    background-image: url("https://www.minecraft.net/etc.clientlibs/minecraftnet/clientlibs/clientlib-site/resources/favicon.ico");
-                                }
-
-                                &.card4>.left {
-                                   background-image: url("https://krita.org/images/favicon.ico");
-                                }
-
-                                &.card5>.left {
-                                    background-image: url("https://www.virtualbox.org/favicon.ico");
-                                }
-
-                                &.card6>.left {
-                                    background-color: #fff;
-                                    background-image: url("https://wiki.documentfoundation.org/images/4/48/LibreOffice_7.5_Main_Icon.svg");
-                                    background-size: 58px 58px;
-                                }
-
-                                &>.right {
-                                    flex: 1;
-                                    min-width: 0;
-
-                                    &>.tit {
-                                        width: 100%;
-
-                                        &>.up {
-                                            width: 100%;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: space-between;
-
-                                            &>.type {
-                                                font-size: 0.85em;
-                                                padding: 4px 8px;
-                                                border-radius: var(--radius-sm);
-                                                background-color: var(--fill);
-                                                color: var(--text2);
-                                                flex-shrink: 0;
-                                            }
-                                        }
-                                    }
+                                &:hover {
+                                    color: var(--theme-1);
                                 }
                             }
+                        }
+
+                        &>.store-featured {
+                            display: grid;
+                            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                            gap: 14px;
                         }
                     }
                 }
@@ -210,4 +191,201 @@
 
 .m-icon {
     font-family: StoreIcons;
+}
+
+/* 应用 / 游戏 / 下载 三页内容内边距 */
+#win-msstore>.page>.cnt.apps,
+#win-msstore>.page>.cnt.game,
+#win-msstore>.page>.cnt.down {
+    padding: 16px 18px 30px 18px;
+}
+
+/* 应用网格 */
+#win-msstore .store-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+/* 应用卡片 */
+#win-msstore .store-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: var(--hover);
+    border-radius: var(--radius-2xl);
+    padding: 14px;
+    transition: background-color 300ms;
+}
+#win-msstore .store-card-icon {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 10px;
+    object-fit: contain;
+    background-color: var(--fill);
+    box-shadow: 0 2px 8px var(--s3d);
+}
+#win-msstore .store-card-info {
+    flex: 1;
+    min-width: 0;
+}
+#win-msstore .store-card-name {
+    font-size: 1.05em;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#win-msstore .store-card-desc {
+    font-size: 0.82em;
+    color: var(--text2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#win-msstore .store-card-cate {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.72em;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    background-color: var(--fill);
+    color: var(--text2);
+}
+#win-msstore .store-card-act {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 0 0 auto;
+}
+#win-msstore .store-card-act .get,
+#win-msstore .store-card-act .open {
+    border: none;
+    padding: 6px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+#win-msstore .store-card-act .get {
+    background-image: linear-gradient(to right bottom, var(--theme-1), var(--theme-2));
+    color: #fff;
+}
+#win-msstore .store-card-act .open {
+    background-color: var(--fill);
+    color: var(--text);
+}
+#win-msstore .installing {
+    font-size: 0.82em;
+    color: var(--text2);
+    white-space: nowrap;
+}
+
+/* 自定义应用表单：默认收起，由标题栏入口呼出 */
+#win-msstore .custom-apps {
+    display: none;
+    margin-bottom: 22px;
+}
+#win-msstore .custom-apps.show {
+    display: block;
+}
+
+/* 商店标题栏自定义入口：低调放置于最小化按钮左侧 */
+.window.msstore .titbar .custom-entry {
+    opacity: 0.4;
+    width: 30px;
+    font-size: 12px;
+    transition: opacity 200ms;
+}
+.window.msstore .titbar .custom-entry:hover {
+    opacity: 1;
+}
+#win-msstore .custom-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+#win-msstore .custom-form input {
+    flex: 1 1 200px;
+    min-width: 0;
+    padding: 9px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--fill);
+    background-color: var(--bg50);
+    color: var(--text);
+    font-size: 0.9em;
+}
+#win-msstore .custom-form button {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #fff;
+    background-image: linear-gradient(to right bottom, var(--theme-1), var(--theme-2));
+}
+
+/* 已安装列表为空 */
+#win-msstore .store-empty {
+    color: var(--text2);
+    font-size: 0.9em;
+    padding: 10px 0;
+}
+
+@media (max-width: 768px) {
+    #win-msstore {
+        grid-template-columns: 60px 1fr;
+    }
+    #win-msstore>.menu>list {
+        margin-left: 2px;
+        padding-right: 4px;
+    }
+    #win-msstore>.menu>list>a {
+        padding: 5px 4px;
+        height: 50px !important;
+    }
+    #win-msstore>.menu>list>icon {
+        font-size: 1.4em;
+    }
+    #win-msstore>.page {
+        border-radius: 6px 0 0 0;
+    }
+    #win-msstore>.page>.cnt.home>.container {
+        padding: 10px 10px 22px 10px;
+        gap: 12px;
+    }
+    #win-msstore>.page>.cnt.home>.container>.store-hero {
+        padding: 18px 18px;
+    }
+    #win-msstore>.page>.cnt.home>.container>.store-hero>.store-hero-title {
+        font-size: 1.3em;
+    }
+    #win-msstore>.page>.cnt.home>.container>.store-hero>.store-hero-sub {
+        font-size: 0.82em;
+    }
+    #win-msstore>.page>.cnt.home>.container>.store-home-section>.store-home-section-tit {
+        margin: 2px 4px 8px;
+        font-size: 1.05em;
+    }
+    #win-msstore>.page>.cnt.home>.container>.store-home-section>.store-featured {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    #win-msstore .store-grid {
+        grid-template-columns: 1fr;
+    }
+    #win-msstore .store-card {
+        padding: 10px;
+        gap: 10px;
+    }
+    #win-msstore .store-card-icon {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+    }
+    #win-msstore .store-card-act {
+        flex-direction: row;
+    }
 }

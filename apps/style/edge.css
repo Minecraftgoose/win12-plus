@@ -119,4 +119,6 @@
 
 #voiceBall {
     aspect-ratio: 1;
+    /* 触屏：将该元素的交互为拖拽所用，避免被浏览器作为滚动手势接管 */
+    touch-action: none;
 }

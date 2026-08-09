@@ -117,7 +117,7 @@ _AI Copilot([相关信息](./scripts/AI%20Copilot%20service/README.md))_
 - [x] 完善小组件，添加到桌面等功能
 - [ ] 动态壁纸
 - [ ] 更多任务栏的自定义
-- [ ] 丰富应用生态，添加 Microsoft Store
+- [x] 丰富应用生态，添加 Microsoft Store
 - [ ] 完善设置及 Windows 更新
 
 下面是一些...呃......畅..想 `~o~)/`：
