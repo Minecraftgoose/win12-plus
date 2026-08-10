@@ -21,3 +21,16 @@
 | pythonEditor.svg | 是 JetBrains s.r.o.的商标 |
 | python.svg | 是 Python 软件基金会的商标 |
 | word.svg | 是微软公司的商标 |
+| store/baidu.webp | 是北京百度网讯科技有限公司的商标 |
+| store/bilibili.webp | 是上海宽娱数码科技有限公司的商标 |
+| store/youtube.webp | 是 Google LLC 的商标 |
+| store/taobao.webp | 是浙江淘宝网络有限公司的商标 |
+| store/jd.webp | 是北京京东世纪贸易有限公司的商标 |
+| store/weibo.webp | 是北京微梦创科网络技术有限公司的商标 |
+| store/zhihu.webp | 是北京智者天下科技有限公司的商标 |
+| store/wangyiyun.webp | 是网易（杭州）网络有限公司的商标 |
+| store/g_genshin.webp | 是上海米哈游影铁科技有限公司的商标 |
+| store/g_minecraft.webp | 无 |
+| store/g_start.webp | 是深圳市腾讯计算机系统有限公司的商标 |
+| store/macos_web.webp | 无 |
+| store/goosehost.webp | 无 |

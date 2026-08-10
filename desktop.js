@@ -70,7 +70,7 @@ document.querySelectorAll('list.focs').forEach(li => {
     li.addEventListener('click', () => {
         let _ = li.$$('span.focs')[0], la = li.$$('a.check')[0],
             las = li.$$('a');
-        if (_ && _.dataset.type == 'abs') {
+        if (_?.dataset.type == 'abs') {
             $(_).addClass('cl');
             $(_).css('top', (la.getBoundingClientRect().top - li.parentElement.getBoundingClientRect().top) + 'px');
             setTimeout(() => {
@@ -1048,8 +1048,6 @@ function syncTaskbarLayout() {
     $('#taskbar').css('width', 4 + count * (34 + 4));
 }
 
-var winCascade = { x: 0, y: 0 };
-
 function openapp(name) {
     if (taskmgrTasks.findIndex(elt => elt.link == name) > -1 && apps.taskmgr.tasks.findIndex(elt => elt.link == name) == -1) {
         apps.taskmgr.tasks.splice(apps.taskmgr.tasks.length, 0, taskmgrTasks.find(elt => elt.link == name));
@@ -1062,8 +1060,6 @@ function openapp(name) {
         return;
     }
     $('.window.' + name).addClass('load');
-    winCascade.x = (winCascade.x + 3) % 33;
-    winCascade.y = (winCascade.y + 3) % 33;
     showwin(name);
     const ic = icon[name] || (name + '.svg');
     const icSrc = /^(https?:|data:)/.test(ic) ? ic : 'icon/' + ic;

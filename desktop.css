@@ -3039,7 +3039,7 @@ body>.container>.image-container>.svg {
         width: 72px;
     }
 
-    /* 移动端窗口：强制全屏并清除桌面端的 scale(0.7)，否则窗口会缩成约 64vw 且被偏移出屏幕 */
+    /* 移动端窗口强制全屏，覆盖桌面端内联定位 */
     body .window.window {
         position: fixed;
         left: 0;
@@ -3047,8 +3047,7 @@ body>.container>.image-container>.svg {
         width: 100vw;
         height: 100vh;
         max-width: 100vw;
-        max-height: 100vh;
-        transform: none;
+        transform: none !important;
         border-radius: 0;
     }
 
@@ -3063,9 +3062,12 @@ body>.container>.image-container>.svg {
         -webkit-overflow-scrolling: touch;
     }
 
-    /* 触屏：标题栏与缩放手柄的交互为拖拽所用，避免被浏览器作为滚动手势接管而中断。
-       touch-action 不继承，故把标题栏与桌面图标的直接子元素也一并置为 none，
-       否则手指落在标题文字/图标/按钮等子节点上仍会被当作滚动 */
+    /* 触屏：加高标题栏，扩大拖拽命中区 */
+    body .window>.titbar {
+        min-height: 44px;
+    }
+
+    /* touch-action 不继承，下推到标题栏与桌面图标的子节点 */
     body .window .titbar,
     body .window .titbar *,
     .window>.resize-bar>.resize-knob,
@@ -3081,34 +3083,28 @@ body>.container>.image-container>.svg {
         overflow-y: auto;
     }
 
-    /* 触屏：放大八个方向手柄的命中区，便于手指拖拽 */
+    /* 触屏：放大八个方向手柄的命中区，命中区贴齐窗口边缘 */
     .window>.resize-bar>.resize-knob.top,
     .window>.resize-bar>.resize-knob.bottom {
-        height: 14px;
+        left: 24px;
+        height: 18px;
+        width: calc(100% - 48px);
     }
 
     .window>.resize-bar>.resize-knob.left,
     .window>.resize-bar>.resize-knob.right {
-        width: 14px;
+        top: 24px;
+        width: 18px;
+        height: calc(100% - 48px);
     }
 
     .window>.resize-bar>.resize-knob.top-left,
     .window>.resize-bar>.resize-knob.top-right,
     .window>.resize-bar>.resize-knob.bottom-left,
     .window>.resize-bar>.resize-knob.bottom-right {
-        width: 22px;
-        height: 22px;
+        width: 24px;
+        height: 24px;
     }
-
-    /* 触屏：窗口全屏时边缘手柄压在系统手势区，向内侧移 10px 以便手指抓取 */
-    .window>.resize-bar>.resize-knob.top { top: 10px; }
-    .window>.resize-bar>.resize-knob.bottom { bottom: 10px; }
-    .window>.resize-bar>.resize-knob.left { left: 10px; }
-    .window>.resize-bar>.resize-knob.right { right: 10px; }
-    .window>.resize-bar>.resize-knob.top-left { top: 10px; left: 10px; }
-    .window>.resize-bar>.resize-knob.top-right { top: 10px; right: 10px; }
-    .window>.resize-bar>.resize-knob.bottom-left { bottom: 10px; left: 10px; }
-    .window>.resize-bar>.resize-knob.bottom-right { bottom: 10px; right: 10px; }
 
 
     body .taskbar-icon {
