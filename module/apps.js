@@ -183,7 +183,7 @@ let apps = {
             try { return 'https://ico.la4.cn/ico.php?url=' + new URL(url).hostname; }
             catch (e) { return 'icon/edge.svg'; }
         },
-        // 硬编码的软件图标直接塞进文件夹，格式是 webp
+        // 硬编码的软件图标直接塞文件夹里了，格式是 webp
         iconOf: (a) => {
             if (!a) return 'icon/edge.svg';
             return a.icon || apps.msstore.faviconOf(a.url);
