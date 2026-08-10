@@ -178,9 +178,9 @@ let apps = {
             try { return JSON.parse(localStorage.getItem(apps.msstore.CUSTOM_KEY) || '[]'); }
             catch (e) { return []; }
         },
-        // 目录应用用随包内置图标；自定义应用无随包图标，回落第三方服务取站点图标（Minecraft_goose：我的 cloudflare 图标中转在写，写好后切到 cloudflare）
+        // 目录应用用随包内置图标；自定义应用无随包图标，回落 cloudflare 图标中转 favicon.cyann.top 取站点图标
         faviconOf: (url) => {
-            try { return 'https://ico.la4.cn/ico.php?url=' + new URL(url).hostname; }
+            try { return 'https://favicon.cyann.top/' + new URL(url).hostname; }
             catch (e) { return 'icon/edge.svg'; }
         },
         // 硬编码的软件图标直接塞文件夹里了，格式是 webp，对了我没搞明白你们那个放 app 的仓库怎么用，没适配哈
