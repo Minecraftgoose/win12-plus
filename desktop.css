@@ -973,6 +973,12 @@ button.dock-btn {
     top: 10px;
 }
 
+/* 系统 app 竖屏侧边栏折叠按钮：桌面端默认隐藏，仅竖屏（见 @media max-width:600px）显示 */
+.sb-toggle,
+.sb-btn {
+    display: none;
+}
+
 #start-menu.max>#startmenu-r>.tuijian>.apps>* {
     width: 25%;
 }
@@ -1019,19 +1025,17 @@ input-before {
     font-size: 15px;
     display: flex;
     align-items: center;
-    /* flex 子项默认 min-width:auto，长文字会把行撑爆；置 0 让省略号生效 */
     min-width: 0;
 }
 
 #startmenu-l>list>a>p {
     margin: 5px 0 5px 10px;
-    /* 长应用名强制单行，超长省略，避免 flex 行内折行破坏垂直对齐 */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* 通过 Store 安装进左侧文字列表的应用（mountApp 生成，带 enable 类） */
+/* 通过 Store 安装进左侧文字列表的应用 */
 #startmenu-l>list>a.enable {
     color: var(--text);
     cursor: default;
@@ -2978,22 +2982,29 @@ body>.container>.image-container>.svg {
     pointer-events: none;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
+    /* 竖屏开始菜单复用桌面自带 .max 全屏态（打开时 JS 加 max 类），不重写全屏定位；仅改单列 */
     #start-menu {
-        width: calc(100vw - 16px);
-        left: 8px;
+        /* 单列：左右两栏上下堆叠 */
+        flex-direction: column;
     }
 
-    #start-menu > #startmenu-l,
-    #start-menu.max > #startmenu-l {
-        flex: 0 0 clamp(120px, 38%, 300px);
-        width: auto;
+    #start-menu > #startmenu-l {
+        flex: 0 0 auto;
+        width: 100%;
         min-width: 0;
+        height: auto;
+        max-height: 45vh;
+        overflow-y: auto;
     }
 
     #start-menu > #startmenu-r {
-        width: auto;
+        flex: 1 1 auto;
+        width: 100%;
         min-width: 0;
+        /* flex 子项默认 min-height:auto 即不小于内容高度，加上 0 让它能被父级 flex 收缩，overflow-y:auto 才生效 */
+        min-height: 0;
+        overflow-y: auto;
     }
 
     #startmenu-l > p {
@@ -3039,15 +3050,68 @@ body>.container>.image-container>.svg {
         width: 72px;
     }
 
-    /* 移动端窗口强制全屏，覆盖桌面端内联定位 */
-    body .window.window {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100vw;
-        height: 100vh;
+    /* 手机竖屏窗口强制全屏固定，禁拖拽与缩放；inset/top/left/宽高 !important 锁死，排除 .min 保留最小化隐藏 */
+    body .window.window:not(.min) {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
         transform: none !important;
         border-radius: 0;
+    }
+
+    /* 手机竖屏不显示缩放手柄 */
+    body .window.window > .resize-bar {
+        display: none !important;
+    }
+
+    /* 手机竖屏隐藏最大化按钮（已全屏固定，无需最大化） */
+    body .window .wbtg.max {
+        display: none !important;
+    }
+
+    /* 手机竖屏隐藏最小化按钮（原生 App 全屏无需最小化，关闭即退到桌面；同时盖掉 calc 的禁用最大化占位） */
+    body .window .wbtg:not(.red):not(.max):not(.custom-entry) {
+        display: none !important;
+    }
+
+    /* 手机竖屏有应用打开时，只显示动态 dock（任务栏），隐藏其余常驻 dock */
+    body:has(#taskbar>a) #dock-box .dock-start,
+    body:has(#taskbar>a) #dock-box .dock.theme,
+    body:has(#taskbar>a) #dock-box .dock.control,
+    body:has(#taskbar>a) #dock-box .dock.date {
+        display: none !important;
+    }
+
+    /* 手机竖屏：系统浮层（搜索 / 小组件 / AI 对话）占满屏，边到边，浮于 dock 之上 */
+    #search-win,
+    #widgets {
+        left: 0;
+        width: 100vw;
+        bottom: 60px;
+        height: calc(100% - 60px);
+        max-height: none;
+        border-radius: 0;
+    }
+
+    /* 小组件竖屏改单列 */
+    #widgets > div {
+        width: 100%;
+    }
+
+    /* AI 对话面板竖屏全屏：隐藏轴用 transform，避开 left+width+right 冲突 */
+    #copilot {
+        left: 0;
+        width: 100vw;
+        top: 0;
+        bottom: 60px;
+        height: auto;
+        border-radius: 0;
+        transform: translateX(100%);
+    }
+
+    #copilot.show {
+        transform: none;
     }
 
     /* 移动端：禁止页面横向溢出，窗口内容可触摸滑动 */
@@ -3074,7 +3138,7 @@ body>.container>.image-container>.svg {
         touch-action: none;
     }
 
-    /* 右键菜单在小屏上限制尺寸，避免溢出视口 */
+    /* 右键菜单在小屏限制尺寸 */
     #cm {
         max-width: 80vw;
         max-height: 60vh;
@@ -3115,5 +3179,277 @@ body>.container>.image-container>.svg {
 
     html {
       scrollbar-width: thin; 
+    }
+
+    /* ===== 系统自带应用竖屏内部布局适配 ===== */
+
+    /* 系统 app 竖屏侧边栏折叠：纯 CSS checkbox hack，汉堡按钮切换 */
+    .sb-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        /* 抬到 dock 上方并压过其层级，保证按钮可点 */
+        bottom: 56px;
+        left: 8px;
+        right: auto;
+        top: auto;
+        z-index: 95;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        flex: none !important;
+        box-sizing: border-box;
+        border-radius: 50%;
+        background: var(--card);
+        color: var(--text);
+        font-size: 20px;
+        box-shadow: 0 2px 8px var(--shadow);
+        cursor: pointer;
+        transition: transform 180ms;
+    }
+    .sb-btn:active {
+        transform: scale(0.92);
+    }
+
+    /* 折叠 */
+    #win-explorer > .page > .menu,
+    #win-setting > .menu,
+    #win-about > .menu,
+    #win-word > .app-left {
+        width: 56px !important;
+        min-width: 56px !important;
+        max-width: 56px !important;
+        overflow: hidden;
+        margin-right: 4px;
+        transition: width 220ms ease;
+    }
+    /* 展开态 */
+    #win-explorer > .sb-toggle:checked ~ .page > .menu,
+    #win-setting > .sb-toggle:checked ~ .menu,
+    #win-about > .sb-toggle:checked ~ .menu,
+    #win-word > .sb-toggle:checked ~ .app-left {
+        width: 260px !important;
+        min-width: 240px !important;
+        max-width: 280px !important;
+    }
+    /* 关于无图标资源，折叠以文字标签呈现 */
+    #win-about > .menu {
+        width: max-content !important;
+        min-width: 0 !important;
+        max-width: 96px !important;
+    }
+    #win-explorer > .page > .menu > .card > .title > span:not(:first-child),
+    #win-explorer > .page > .menu > .card > list > a > span:not(:first-child),
+    #win-setting > .menu > .user > div,
+    #win-setting > .menu > .input,
+    #win-setting > .menu > list > a > span:not(:first-child),
+    #win-word > .app-left > .focs > .home > span {
+        display: none !important;
+    }
+    /* 菜单项紧凑居中 */
+    #win-explorer > .page > .menu > .card {
+        margin: 6px 0;
+        padding: 4px 0;
+    }
+    #win-explorer > .page > .menu > .card > .title {
+        font-size: 0;
+        padding: 6px 0;
+        text-align: center;
+    }
+    #win-explorer > .page > .menu > .card > list > a,
+    #win-setting > .menu > list > a,
+    #win-about > .menu > list > a {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center;
+    }
+    /* 展开恢复 */
+    #win-explorer > .sb-toggle:checked ~ .page > .menu > .card {
+        margin: 10px 0 10px 15px;
+        padding: 4px;
+    }
+    #win-explorer > .sb-toggle:checked ~ .page > .menu > .card > .title {
+        font-size: revert;
+        padding: 6px 10px;
+        text-align: left;
+    }
+    #win-explorer > .sb-toggle:checked ~ .page > .menu > .card > list > a,
+    #win-setting > .sb-toggle:checked ~ .menu > list > a,
+    #win-about > .sb-toggle:checked ~ .menu > list > a {
+        padding-left: 20px !important;
+        padding-right: 5px !important;
+        justify-content: flex-start;
+    }
+    /* 展开显示文字 */
+    #win-explorer > .sb-toggle:checked ~ .page > .menu > .card > .title > span:not(:first-child),
+    #win-explorer > .sb-toggle:checked ~ .page > .menu > .card > list > a > span:not(:first-child),
+    #win-setting > .sb-toggle:checked ~ .menu > .user > div,
+    #win-setting > .sb-toggle:checked ~ .menu > .input,
+    #win-setting > .sb-toggle:checked ~ .menu > list > a > span:not(:first-child),
+    #win-word > .sb-toggle:checked ~ .app-left > .focs > .home > span {
+        display: revert !important;
+    }
+
+    /* 此电脑紧凑布局 */
+    #win-explorer > .page > .main > .content {
+        margin: 0 8px 10px 0;
+        padding: 10px 6px 30px 6px;
+    }
+    #win-explorer > .path > .search {
+        min-width: 90px;
+        width: 32%;
+    }
+    /* 竖屏隐藏工具栏文字按钮保留图标按钮 */
+    #win-explorer > .page > .main > .tool > a.t {
+        display: none !important;
+    }
+
+    #win-setting > .page {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    #win-setting > .page > .cnt {
+        max-width: 100%;
+    }
+    #win-setting > .page > .cnt.home > .divider {
+        flex-direction: column;
+    }
+    #win-setting > .page > .cnt.home > .divider > * {
+        width: 100%;
+    }
+
+    #win-taskmgr {
+        grid-template-columns: 1fr;
+    }
+    #win-taskmgr > .menu {
+        display: flex;
+        flex-direction: row;
+        max-height: 46px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        align-items: center;
+        padding: 0;
+    }
+    #win-taskmgr > .menu > list.focs {
+        display: flex;
+        flex-direction: row;
+        height: auto;
+        margin: 0 4px;
+    }
+    #win-taskmgr > .menu > list.focs > a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        flex: 0 0 auto;
+        padding: 0 14px;
+    }
+    /* 竖屏工具栏仅显示图标：隐藏文字段（<p>），保留 <icon> 字形 */
+    #win-taskmgr > .menu > list.focs > a > p {
+        display: none !important;
+    }
+    /* 横排工具栏中设置项按常规流排列 */
+    #win-taskmgr > .menu > list.focs > a.setting {
+        position: static !important;
+    }
+    #win-taskmgr > .menu > .fold {
+        max-width: none;
+        margin: 0 4px;
+    }
+    #win-taskmgr > .main > .cnt.processes.show > table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    #win-taskmgr > .main > .cnt.performance > .content {
+        grid-template-columns: 1fr;
+    }
+    #win-taskmgr > .main > .cnt.performance > .content > .select-menu {
+        max-height: none;
+        margin-right: 0;
+        display: flex;
+        overflow-x: auto;
+    }
+    #win-taskmgr > .main > .cnt.performance > .content > .select-menu > * {
+        flex: 0 0 200px;
+    }
+
+    /* winver 全屏后正文边距收窄 */
+    #win-winver > p {
+        margin: 0 16px;
+    }
+
+    /* Word：左侧已并入折叠态；主区输入框满宽、文档去大内边距、ribbon 横向滚动 */
+    #win-word > .app-left > .focs > .home > * {
+        max-width: 100%;
+        min-width: 0;
+        font-size: 20px;
+    }
+    #win-word > .app-main > .input {
+        width: 100% !important;
+    }
+    .window.word > .pages > .edit > .content > .doc {
+        width: 100%;
+        padding: 24px;
+        aspect-ratio: auto;
+    }
+    .window.word > .pages > .edit > .ribbon > .items {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    /* Edge：iframe 竖屏去圆角，贴合全屏窗口 */
+    #win-edge > iframe.show {
+        border-radius: 0;
+    }
+
+    /* ===== 竖屏全屏界面：设置窗口间距 ===== */
+    /* 关闭按钮留右边距 */
+    body .window.window > .titbar {
+        padding-right: 12px;
+    }
+    body .window.window .wbtg.red {
+        margin-right: 2px;
+    }
+    /* 侧栏离左边缘留呼吸位 + 圆角 */
+    #win-setting > .menu {
+        margin-left: 4px;
+        border-radius: var(--radius-2xl);
+    }
+    /* 主区右侧给滚动条留白 */
+    #win-setting > .page {
+        padding-right: 14px;
+    }
+    /* 推荐设置内 setting-list 去掉左右 margin */
+    .setting-card > .setting-list {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    /* ===== 竖屏全屏界面 ===== */
+    #start-menu.max #startmenu-l > .input {
+        width: calc(100% - 16px);
+        margin: 0 8px;
+        padding-left: 12px;
+    }
+    #start-menu.max #startmenu-r {
+        position: relative;
+    }
+    #start-menu.max #startmenu-r > .row1 > .tool {
+        position: absolute;
+        right: 16px;
+        bottom: 16px;
+        margin: 0;
+        z-index: 5;
+    }
+    #start-menu.max #startmenu-r > .pinned > .apps > .sm-app {
+        overflow: hidden;
+    }
+    #start-menu.max #startmenu-r > .pinned > .apps > .sm-app > *:last-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }

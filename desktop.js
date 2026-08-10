@@ -1109,6 +1109,7 @@ function openDockWidget(name) {
             }
             if ($('#widgets').hasClass('show')) hide_widgets();
             $('#start-menu').addClass('show-begin');
+            if (window.innerWidth <= 600) $('#start-menu').addClass('max');
             setTimeout(() => {
                 $('#start-menu').addClass('show');
             }, 0);
@@ -1205,6 +1206,7 @@ function removeEdgeSaveUrl(classname) {
 
 function hide_startmenu() {
     $('#start-menu').removeClass('show');
+    $('#start-menu').removeClass('max');
     $('#start-btn').removeClass('show');
     setTimeout(() => { $('#start-menu').removeClass('show-begin'); }, 200);
 }

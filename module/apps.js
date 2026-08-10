@@ -178,7 +178,7 @@ let apps = {
             try { return JSON.parse(localStorage.getItem(apps.msstore.CUSTOM_KEY) || '[]'); }
             catch (e) { return []; }
         },
-        // 目录应用用随包内置图标；自定义应用无随包图标，回落第三方服务取站点图标（ Minecraft_goose ： 我的 cloudflare 图标中转在写，写好后切到 cloudflare）
+        // 目录应用用随包内置图标；自定义应用无随包图标，回落第三方服务取站点图标（Minecraft_goose：我的 cloudflare 图标中转在写，写好后切到 cloudflare）
         faviconOf: (url) => {
             try { return 'https://ico.la4.cn/ico.php?url=' + new URL(url).hostname; }
             catch (e) { return 'icon/edge.svg'; }

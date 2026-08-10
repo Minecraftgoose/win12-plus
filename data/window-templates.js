@@ -319,7 +319,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 		<div class="loadback">
 			<img src="icon/setting.svg" class="icon">
 		</div>
-		<div class="content" id="win-setting">
+		<div class="content" id="win-setting"><input type="checkbox" id="setting-sb" class="sb-toggle"><label class="sb-btn" for="setting-sb" aria-label="折叠侧边栏"><i class="bi bi-list"></i></label>
 			<div class="menu">
 				<a class="a user" onclick="$('#win-setting>.menu>list>a.user')[0].click();">
 					<svg viewBox="0,0,257,344" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" overflow="hidden"><defs><clipPath id="user-clip1"><rect x="382" y="195" width="257" height="344" /></clipPath><linearGradient x1="351.462" y1="233.56" x2="669.496" y2="500.422" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="user-fill3"><stop offset="0" stop-color="#A964C8" /><stop offset="0.35" stop-color="#A964C8" /><stop offset="0.87" stop-color="#2D8AD5" /><stop offset="1" stop-color="#2D8AD5" /></linearGradient><linearGradient x1="351.462" y1="233.56" x2="669.496" y2="500.422" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="user-fill4"><stop offset="0" stop-color="#A964C8" /><stop offset="0.35" stop-color="#A964C8" /><stop offset="0.87" stop-color="#2D8AD5" /><stop offset="1" stop-color="#2D8AD5" /></linearGradient></defs><g clip-path="url(#user-clip1)" transform="translate(-382 -195)"><path d="M637.755 433.872C642.215 515.221 579.577 537.983 508.011 537.983 436.444 537.983 376.676 507.833 383.513 437.11 383.109 425.234 389.59 414.133 398.634 409.891 413.82 402.768 444.753 402.936 507.484 402.997 570.214 403.058 609.164 402.279 621.521 407.947 633.878 413.614 638.011 424.609 637.755 433.872Z" fill="url(#user-fill3)" fill-rule="evenodd" /><path d="M422 285C422 235.847 461.623 196 510.5 196 559.377 196 599 235.847 599 285 599 334.153 559.377 374 510.5 374 461.623 374 422 334.153 422 285Z" fill="url(#user-fill4)" fill-rule="evenodd" /></g></svg>
@@ -715,7 +715,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 		<div class="loadback">
 			<img src="icon/explorer.svg" class="icon">
 		</div>
-		<div class="content" id="win-explorer">
+		<div class="content" id="win-explorer"><input type="checkbox" id="explorer-sb" class="sb-toggle"><label class="sb-btn" for="explorer-sb" aria-label="折叠侧边栏"><i class="bi bi-list"></i></label>
 			<div class="path">
 				<a class="a btn btn-icon back" onclick="apps.explorer.back(apps.explorer.tabs[apps.explorer.now][0])"><i class="bi bi-arrow-left"></i></a>
 				<a class="a btn btn-icon front" onclick="apps.explorer.front(apps.explorer.tabs[apps.explorer.now][0])"><i class="bi bi-arrow-right"></i></a>
@@ -731,7 +731,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 						<p class="title"><span style="font: 15px;">📌</span> <span data-i18n="explorer.pinned">已固定</span></p>
 						<list>
 							<a onclick="shownotice('no-files-permission')"><img src="apps/icons/explorer/qa.png"><span data-i18n="explorer.quickacc">快速访问</span></a>
-							<a onclick="shownotice('no-files-permission')"><img src="apps/icons/explorer/od.png">OneDrive</a>
+							<a onclick="shownotice('no-files-permission')"><img src="apps/icons/explorer/od.png"><span>OneDrive</span></a>
 							<a class="check" onclick="apps.explorer.reset();"><span
 									style="background:linear-gradient(180deg, var(--theme-1), var(--theme-2));width:4px;height: 19px;border-radius: 10px;margin-left: -12px;margin-right: 8px;margin-top: 1px;"></span>
 								<img src="apps/icons/explorer/thispc.svg"><span data-i18n="explorer.thispc">此电脑</span></a>
@@ -866,7 +866,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 		<div class="loadback">
 			<img src="icon/about.svg" class="icon">
 		</div>
-		<div class="content" id="win-about">
+		<div class="content" id="win-about"><input type="checkbox" id="about-sb" class="sb-toggle"><label class="sb-btn" for="about-sb" aria-label="折叠侧边栏"><i class="bi bi-list"></i></label>
 			<div class="menu">
 				<!-- <list class="focs">
 					<a onclick="$('#win-about>.about').addClass('show');$('#win-about>.update').removeClass('show');"><img src="apps/icons/about/info.svg" height="17px" width="19px"><span data-i18n="about.intro">简介</span></a>
@@ -2240,7 +2240,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 		</div>
 		<div class="pages">
 		<div class="home show">
-			<div class="content" id="win-word">
+			<div class="content" id="win-word"><input type="checkbox" id="word-sb" class="sb-toggle"><label class="sb-btn" for="word-sb" aria-label="折叠侧边栏"><i class="bi bi-list"></i></label>
 				<div class="app-left">
 					<list class="focs">
 						<a class="back" onclick="apps.word.edit()"><i class="bi bi-arrow-left-circle"></i></a>
