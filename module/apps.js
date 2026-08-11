@@ -2,7 +2,12 @@
 let apps = {
     setting: {
         init: () => {
-            $('#win-setting>.menu>list>a.home')[0].click();
+            if (window.innerWidth <= 600) {
+                // 竖屏打开默认停在顶层列表，不自动钻进主页子页
+                $('#win-setting').removeClass('drilled');
+            } else {
+                $('#win-setting>.menu>list>a.home')[0].click();
+            }
             $('#win-setting>.page>.cnt.update>.setting-list>div:last-child>.alr>a.checkbox')[localStorage.getItem('autoUpdate') == 'true' ? 'addClass' : 'removeClass']('checked');
             apps.setting.checkUpdate();
             // 加载已保存的蓝屏颜色
@@ -16,6 +21,10 @@ let apps = {
             $('#win-setting>.page>.cnt.' + name).addClass('show');
             $('#win-setting>.menu>list>a.check').removeClass('check');
             $('#win-setting>.menu>list>a.' + name).addClass('check');
+            $('#win-setting').addClass('drilled');
+        },
+        back: () => {
+            $('#win-setting').removeClass('drilled');
         },
         theme_get: () => {
             $('#set-theme').html(`<loading><svg width="30px" height="30px" viewBox="0 0 16 16">
@@ -277,7 +286,8 @@ let apps = {
         openApp: (id) => { openapp(id); },
         mountApp: (id, url, name, fav, isCustom) => {
             const favicon = fav || apps.msstore.faviconOf(url);
-            icon[id] = favicon;
+            // msstore 传入的 favicon 已带前缀，这里去掉，否则会拼成 icon/icon/... 的雷霆路径。
+            icon[id] = favicon.startsWith('icon/') ? favicon.slice(5) : favicon;
             if ($('.window.' + id).length) return;
             const winHtml = `<div class="window ${id} webapp">
                 <div class="resize-bar"></div>
@@ -297,9 +307,9 @@ let apps = {
             apps[id] = createWebapp(id, url);
             apps.msstore.bindWindowChrome(id);
             const entry = `<a class="a enable ${id}" id="startapp-${id}" data-cm-name="${apps.msstore.esc(name)}" oncontextmenu="return showcm(event,'smlapp',['${id}',this.dataset.cmName])" onclick="openapp('${id}');hide_startmenu();"><img src="${favicon}" onerror="this.src='icon/edge.svg'"><p>${apps.msstore.esc(name)}</p></a>`;
-            // 刷新恢复或重装时清理旧的开始菜单条目，避免残留无 class 的版本造成图标过宽
+            // 刷新恢复或重装时清理旧的开始菜单条目
             $('#startapp-' + id).remove();
-            const anchor = $('#start-menu a[onclick*="openapp(\'msstore\')"]');
+            const anchor = $('#startmenu-l a[onclick*="openapp(\'vscode\')"]');
             if (anchor.length) anchor.after(entry);
             apps.msstore.mountDesktop(id, name, favicon);
         },
@@ -501,6 +511,12 @@ let apps = {
         },
         wifiChart: null,
         wifiBg: null,
+        ethernet: {
+            receive: 0,
+            send: 0
+        },
+        ethernetChart: null,
+        ethernetBg: null,
         gpu: {
             d3: 0,
             copy: 0,
@@ -611,6 +627,11 @@ let apps = {
                 apps.taskmgr.wifiBg = performance.$$('.graph-wifi>.graph>.bg')[0];
                 apps.taskmgr.wifiChart.innerHTML = '<path d="M 6000 1000" stroke="#8e5829" stroke-width="3px" fill="#8e582922" /><path d="M 6000 1000" stroke="#8e5829" stroke-width="3px" fill="none" stroke-dasharray="10, 10" />';
                 apps.taskmgr.wifiBg.innerHTML = '<g class="col"></g><g class="row"></g>';
+
+                apps.taskmgr.ethernetChart = performance.$$('.graph-ethernet>.graph>.chart')[0];
+                apps.taskmgr.ethernetBg = performance.$$('.graph-ethernet>.graph>.bg')[0];
+                apps.taskmgr.ethernetChart.innerHTML = '<path d="M 6000 1000" stroke="#d35e3b" stroke-width="3px" fill="#d35e3b22" /><path d="M 6000 1000" stroke="#d35e3b" stroke-width="3px" fill="none" stroke-dasharray="10, 10" />';
+                apps.taskmgr.ethernetBg.innerHTML = '<g class="col"></g><g class="row"></g>';
 
                 apps.taskmgr.gpu3Chart = performance.$$('.graph-gpu>.graphs>svg')[0];
                 apps.taskmgr.gpu3Chart.innerHTML = '<path d="M 6000 1000" stroke="#2983cc" stroke-width="3px" fill="#2983cc22" />';
@@ -816,6 +837,11 @@ let apps = {
             $('#win-taskmgr>.main>.cnt.performance>.content>.performance-graph>.graph-wifi>.information>.left>div:nth-child(1)>.value')[0].innerText = `${apps.taskmgr.wifi.send.toFixed(2)} Mbps`;
             $('#win-taskmgr>.main>.cnt.performance>.content>.performance-graph>.graph-wifi>.information>.left>div:nth-child(2)>.value')[0].innerText = `${apps.taskmgr.wifi.receive.toFixed(2)} Mbps`;
             $('#win-taskmgr>.main>.cnt.performance>.content>.select-menu>.graph-wifi>.right>.data>.value2')[0].innerText = `发送： ${apps.taskmgr.wifi.send} 接收： ${apps.taskmgr.wifi.receive} Mbps`;
+
+            apps.taskmgr.ethernet.receive = Number((Math.random() * 100).toFixed(2));
+            apps.taskmgr.ethernet.send = Number((Math.random() * 100).toFixed(2));
+            $('#win-taskmgr>.main>.cnt.performance>.content>.performance-graph>.graph-ethernet>.information>.left>div:nth-child(1)>.value')[0].innerText = `${apps.taskmgr.ethernet.send.toFixed(1)} Kbps`;
+            $('#win-taskmgr>.main>.cnt.performance>.content>.performance-graph>.graph-ethernet>.information>.left>div:nth-child(2)>.value')[0].innerText = `${apps.taskmgr.ethernet.receive.toFixed(1)} Kbps`;
         },
         drawGraph: (chart, data, nth = 0) => {
             var path = $(chart.querySelectorAll('path')[nth]).attr('d');
@@ -866,6 +892,8 @@ let apps = {
             apps.taskmgr.drawGraph(apps.taskmgr.disk2Chart, apps.taskmgr.diskSpeed.write * 10, 1);
             apps.taskmgr.drawGraph(apps.taskmgr.wifiChart, apps.taskmgr.wifi.receive * 10, 0);
             apps.taskmgr.drawGraph(apps.taskmgr.wifiChart, apps.taskmgr.wifi.send * 10, 1);
+            apps.taskmgr.drawGraph(apps.taskmgr.ethernetChart, apps.taskmgr.ethernet.receive * 10, 0);
+            apps.taskmgr.drawGraph(apps.taskmgr.ethernetChart, apps.taskmgr.ethernet.send * 10, 1);
             for (var i = 0; i < 4; i++) {
                 apps.taskmgr.drawGraph(apps.taskmgr.gpuChart[i], apps.taskmgr.gpu[['d3', 'copy', 'videop', 'videod'][i]] * 10);
             }
@@ -878,6 +906,7 @@ let apps = {
             menu.$$('.graph-memory svg')[0].innerHTML = apps.taskmgr.memoryChart.innerHTML;
             menu.$$('.graph-disk svg')[0].innerHTML = apps.taskmgr.diskChart.innerHTML;
             menu.$$('.graph-wifi svg')[0].innerHTML = apps.taskmgr.wifiChart.innerHTML;
+            menu.$$('.graph-ethernet svg')[0].innerHTML = apps.taskmgr.ethernetChart.innerHTML;
             menu.$$('.graph-gpu svg')[0].innerHTML = apps.taskmgr.gpu3Chart.innerHTML;
         },
         changeSort: (elt, type) => {
@@ -902,6 +931,7 @@ let apps = {
             apps.taskmgr.changeGrids(apps.taskmgr.diskBg);
             apps.taskmgr.changeGrids(apps.taskmgr.disk2Bg);
             apps.taskmgr.changeGrids(apps.taskmgr.wifiBg);
+            apps.taskmgr.changeGrids(apps.taskmgr.ethernetBg);
             apps.taskmgr.gpuBg.forEach(function (chart) {
                 apps.taskmgr.changeGrids(chart);
             });
@@ -940,6 +970,7 @@ let apps = {
             apps.taskmgr.initgrids(apps.taskmgr.memoryBg);
             apps.taskmgr.initgrids(apps.taskmgr.disk2Bg);
             apps.taskmgr.initgrids(apps.taskmgr.wifiBg);
+            apps.taskmgr.initgrids(apps.taskmgr.ethernetBg);
             for (var i = 0; i < 4; i++) {
                 apps.taskmgr.initgrids(apps.taskmgr.gpuBg[i]);
             }

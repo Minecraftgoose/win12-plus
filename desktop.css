@@ -979,6 +979,11 @@ button.dock-btn {
     display: none;
 }
 
+/* 设置竖屏返回栏：桌面端隐藏，仅竖屏钻进子页时显示（见 @media max-width:600px） */
+#win-setting > .page > .setting-back {
+    display: none;
+}
+
 #start-menu.max>#startmenu-r>.tuijian>.apps>* {
     width: 25%;
 }
@@ -3242,9 +3247,6 @@ body>.container>.image-container>.svg {
     }
     #win-explorer > .page > .menu > .card > .title > span:not(:first-child),
     #win-explorer > .page > .menu > .card > list > a > span:not(:first-child),
-    #win-setting > .menu > .user > div,
-    #win-setting > .menu > .input,
-    #win-setting > .menu > list > a > span:not(:first-child),
     #win-word > .app-left > .focs > .home > span {
         display: none !important;
     }
@@ -3320,43 +3322,116 @@ body>.container>.image-container>.svg {
         width: 100%;
     }
 
+    /* 竖屏设置：手机层级导航 */
+    #win-setting > .sb-toggle,
+    #win-setting > .sb-btn {
+        display: none !important;
+    }
+    #win-setting > .menu {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        margin-right: 0 !important;
+        overflow: auto !important;
+    }
+    #win-setting > .menu > list > a {
+        justify-content: flex-start !important;
+        padding-left: 16px !important;
+        padding-right: 44px !important;
+        min-height: 48px;
+        position: relative;
+    }
+    #win-setting > .menu > list > a > span {
+        display: revert !important;
+    }
+    #win-setting > .menu > list > a::after {
+        content: "\203A";
+        position: absolute;
+        right: 16px;
+        font-size: 22px;
+        line-height: 1;
+        color: var(--text2);
+    }
+    /* 默认显示顶层列表，隐藏右侧子页 */
+    #win-setting > .page {
+        display: none;
+        width: 100% !important;
+        height: 100%;
+        overflow-y: auto;
+        padding: 0 !important;
+        background: var(--bg50);
+    }
+    #win-setting.drilled > .menu {
+        display: none;
+    }
+    #win-setting.drilled > .page {
+        display: block;
+    }
+    /* 返回栏，仅竖屏钻进子页时显示 */
+    #win-setting.drilled > .page > .setting-back {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        height: 48px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--border, #ffffff20);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--bg50);
+        backdrop-filter: inherit;
+        -webkit-backdrop-filter: inherit;
+        cursor: pointer;
+    }
+    #win-setting.drilled > .page > .setting-back > i {
+        font-size: 20px;
+    }
+
+    /* 竖屏任务管理器*/
     #win-taskmgr {
-        grid-template-columns: 1fr;
+        display: flex !important;
+    }
+    #win-taskmgr > .sb-btn {
+        display: none !important;
     }
     #win-taskmgr > .menu {
-        display: flex;
-        flex-direction: row;
-        max-height: 46px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        align-items: center;
-        padding: 0;
+        display: flex !important;
+        flex-direction: column;
+        flex: 0 0 56px !important;
+        width: 56px !important;
+        min-width: 56px !important;
+        max-width: 56px !important;
+        overflow: hidden !important;
+        position: relative;
+    }
+    #win-taskmgr > .menu > a.fold {
+        display: none !important;
     }
     #win-taskmgr > .menu > list.focs {
-        display: flex;
-        flex-direction: row;
-        height: auto;
-        margin: 0 4px;
+        display: flex !important;
+        flex-direction: column;
+        flex: 1 1 auto;
+        height: auto !important;
+        margin: 0 !important;
+        position: relative;
     }
     #win-taskmgr > .menu > list.focs > a {
         display: flex;
         align-items: center;
         justify-content: center;
-        white-space: nowrap;
-        flex: 0 0 auto;
-        padding: 0 14px;
+        padding: 5px 0 !important;
     }
-    /* 竖屏工具栏仅显示图标：隐藏文字段（<p>），保留 <icon> 字形 */
     #win-taskmgr > .menu > list.focs > a > p {
         display: none !important;
     }
-    /* 横排工具栏中设置项按常规流排列 */
     #win-taskmgr > .menu > list.focs > a.setting {
         position: static !important;
+        bottom: auto !important;
+        margin-top: auto;
     }
-    #win-taskmgr > .menu > .fold {
-        max-width: none;
-        margin: 0 4px;
+    #win-taskmgr > .main {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
     }
     #win-taskmgr > .main > .cnt.processes.show > table {
         display: block;
@@ -3435,7 +3510,7 @@ body>.container>.image-container>.svg {
         padding-left: 12px;
     }
     #start-menu.max #startmenu-r {
-        position: relative;
+        display: none;
     }
     #start-menu.max #startmenu-r > .row1 > .tool {
         position: absolute;
@@ -3451,5 +3526,39 @@ body>.container>.image-container>.svg {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+    /* 竖屏开始菜单只显示左侧应用列表：选择器都用 > 直接子匹配，特异性 (0,3,0,0) 跟桌面态平级、位于其后，确保压过桌面 #start-menu.max>#startmenu-l{width:22%;min-width:300px} */
+    #start-menu.max > #startmenu-l {
+        width: 100%;
+        min-width: 0;
+        height: 100%;
+        max-height: none;
+    }
+    #start-menu.max > #startmenu-l > #startmenu-user {
+        top: 0;
+        width: 80px;
+        height: 80px;
+        left: calc(50% - 40px);
+        font-size: 64px;
+        margin-bottom: 0;
+    }
+    #start-menu.max > #startmenu-l > #startmenu-user > svg {
+        width: 56px;
+        height: 56px;
+    }
+    #start-menu.max > #startmenu-l > p {
+        margin: 8px 0 14px 0 !important;
+        font-size: 24px !important;
+        line-height: 1.5;
+        max-width: 100%;
+        box-sizing: border-box;
+        padding: 0 4px 4px;
+        overflow: visible;
+    }
+    #start-menu.max #startmenu-l>list>p.text[data-i18n="stmenu-webapp"] {
+        margin-top: 28px;
+    }
+    #start-menu.max #startmenu-l>list {
+        padding-bottom: 80px;
     }
 }

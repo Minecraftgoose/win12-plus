@@ -347,6 +347,7 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 				</list>
 			</div>
 			<div class="page">
+				<div class="setting-back" onclick="apps.setting.back()"><i class="bi bi-chevron-left"></i><span data-i18n="setting.name">设置</span></div>
 				<!-- 主页  begin -->
 				<div class="cnt home show">
 					<p class="title">主页</p>
@@ -933,6 +934,12 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 			<div class="cnt update update-web">
 				<h1 class="tit" data-i18n="about.update.name"><span></span>更新记录</h1>
 				<div style="margin-left: 20px;">
+					<details><summary><span>v10.2.5</span> 完善 Microsoft Store 与移动端竖屏适配</summary><p>
+						&emsp;&emsp;-(更新来自 @Minecraftgoose)<br>
+						&emsp;&emsp;-完善 Microsoft Store 应用，win12 拥有下载软件能力<br>
+						&emsp;&emsp;-完善移动端适配，所有窗口均支持竖屏查看<br>
+						&emsp;&emsp;-任务管理器新增以太网<br>
+					</p></details>
 					<details><summary><span>v10.2.4</span> 新增《Copliot 用户协议》和《Copliot 隐私政策》</summary><p>
 						&emsp;&emsp;-(更新来自 @tangyuan0821)<br>
 						&emsp;&emsp;-我们添加了《Copliot 用户协议》与《Copliot 隐私政策》，现已生效
@@ -1827,6 +1834,8 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 			<img src="icon/taskmgr.png" class="icon">
 		</div>
 		<div class="content" id="win-taskmgr" style="height:100%">
+			<input class="sb-toggle" id="taskmgr-sb">
+			<label class="sb-btn" for="taskmgr-sb">☰</label>
 			<div class="menu" style="height:100%; display: flex; flex-direction: column;">
 				<a class="fold" onclick="apps.taskmgr.fold()" win12_title="折叠"><i class="bi bi-list"></i></a>
 				<list class="focs">
@@ -1904,6 +1913,18 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 									<div class="data">
 										<div class="tit">SSD</div>
 										<div class="value2">1.14%</div>
+									</div>
+								</div>
+							</div>
+							<div onclick="apps.taskmgr.graph('graph-ethernet');" class="graph-ethernet">
+								<div class="left">
+									<svg class="graph-view-ethernet" viewBox="0 0 6000 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
+								</div>
+								<div class="right">
+									<div class="tit">以太网</div>
+									<div class="data">
+										<div class="tit">Cloudflare WARP Interface Tunnel</div>
+										<div class="value2">1 Mbps</div>
 									</div>
 								</div>
 							</div>
@@ -2064,9 +2085,43 @@ const windowMarkup = `	<div class="window defender" data-min-width="800" style="
 									</div>
 								</div>
 							</div>
-							<div class="graph-wifi">
-								<div class="tit">
-									<div class="left-name">Wi-Fi</div>
+						<div class="graph-ethernet">
+							<div class="tit">
+								<div class="left-name">以太网</div>
+								<div class="right-message">Cloudflare WARP Interface Tunnel</div>
+							</div>
+							<div class="graph-msg top">
+								<div class="left">吞吐量</div>
+								<div class="right">1 Mbps</div>
+							</div>
+							<div class="graph" win12_title="此网络上的发送和接收活动">
+								<svg viewBox="0 0 6000 1000" preserveAspectRatio="none" class="bg" xmlns="http://www.w3.org/2000/svg"></svg>
+								<svg viewBox="0 0 6000 1000" preserveAspectRatio="none" class="chart" xmlns="http://www.w3.org/2000/svg"></svg>
+							</div>
+							<div class="graph-msg bottom">
+								<div class="left">60 秒</div>
+								<div class="right">0</div>
+							</div>
+							<div class="information">
+								<div class="left">
+									<div style="border-left: 2px #d35e3b dotted; padding-left: 10px;"><div class="top">发送</div><div class="value">240 Kbps</div></div>
+									<div style="border-left: 2px #d35e3b solid; padding-left: 10px;"><div class="top">接收</div><div class="value">64.0 Kbps</div></div>
+								</div>
+								<div class="right">
+									<table>
+										<tbody>
+											<tr><td>适配器名称：</td><td>CloudflareWARP</td></tr>
+											<tr><td>连接类型：</td><td>以太网</td></tr>
+						<tr><td>IPv4 地址：</td><td>192.168.50.18</td></tr>
+						<tr><td>IPv6 地址：</td><td>2001:db8:ab::42</td></tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="graph-wifi">
+							<div class="tit">
+								<div class="left-name">Wi-Fi</div>
 									<div class="right-message">NB Wireless LAN 802.11ac</div>
 								</div>
 								<div class="graph-msg top">

@@ -269,6 +269,10 @@
     border-color: #8e5829;
 }
 
+#win-taskmgr>.main>.cnt.performance>.content>.select-menu>*>.left>.graph-view-ethernet {
+    border-color: #d35e3b;
+}
+
 #win-taskmgr>.main>.cnt.performance>.content>.select-menu>*>.left>.graph-view-gpu {
     border-color: var(--href);
 }
@@ -380,6 +384,7 @@
 #win-taskmgr>.main>.cnt.performance>.content>.performance-graph>*>.information>.right>table>tbody>tr>td:first-child {
     color: var(--text2);
     padding-right: 20px;
+    white-space: nowrap;
 }
 
 #win-taskmgr>.main>.cnt.performance>.content>.performance-graph>.graph-gpu>.graphs {
