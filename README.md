@@ -1,3 +1,11 @@
+### 写在最前面
+这个仓库是[win12](https://github.com/win12-online/win12)的增量版，并使用了AI（混元3）开发
+
+我向原仓库提交过[PR](https://github.com/win12-online/win12/pull/890)但是win12的开发者们貌似很讨厌vibecoding
+所以我也不打扰他们了
+> 以下是原仓库原文
+
+
 <p align="center">
     <img src="./icon/windows12.svg" width="100" height="100">
 </p>
