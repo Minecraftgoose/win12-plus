@@ -5,6 +5,9 @@ let dymanic = [
   'assets.msn.cn'
 ]
 const CACHE = 'def2';
+this.addEventListener('install', function () {
+  self.skipWaiting();
+});
 this.addEventListener('fetch', function (event) {
   if (!/^https?:$/.test(new URL(event.request.url).protocol)) return
   if (event.request.method !== 'GET') return
@@ -110,9 +113,11 @@ this.addEventListener('message', function (e) {
 });
 this.addEventListener('activate', function (event) {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+    self.clients.claim().then(() =>
+      caches.keys().then(keys =>
+        Promise.all(
+          keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+        )
       )
     ).then(() => update(false))
   );
