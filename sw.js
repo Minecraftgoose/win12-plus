@@ -4,9 +4,14 @@ let dymanic = [
   'win12server.freehk.svipss.top',
   'assets.msn.cn'
 ]
+const CACHE = 'def2';
 this.addEventListener('fetch', function (event) {
   if (!/^https?:$/.test(new URL(event.request.url).protocol)) return
   if (event.request.method !== 'GET') return
+
+  const reqUrl = new URL(event.request.url);
+  const isNav = event.request.mode === 'navigate' ||
+    /\/index\.html$/.test(reqUrl.pathname);
 
   event.respondWith(
     caches.match(event.request).then(res => {
@@ -21,12 +26,24 @@ this.addEventListener('fetch', function (event) {
         console.log('动态请求', event.request.url);
         return fetch(event.request);
       }
+      if (isNav) {
+        // 导航（index.html）网络优先，避免旧缓存喂出过期重定向
+        return fetch(event.request)
+          .then(r => {
+            if (r && r.ok) {
+              const c = r.clone();
+              caches.open(CACHE).then(cache => cache.put(event.request, c));
+            }
+            return r;
+          })
+          .catch(() => res || fetch(event.request));
+      }
       return (res && res.ok) ? res :
         fetch(event.request)
           .then(responese => {
             if (!responese.ok) return responese;
             const responeseClone = responese.clone();
-            return caches.open('def').then(cache => {
+            return caches.open(CACHE).then(cache => {
               console.log('下载数据', responeseClone.url);
               return cache.put(event.request, responeseClone);
             }).catch(err => {
@@ -40,7 +57,7 @@ this.addEventListener('fetch', function (event) {
     })
   )
 });
-const cacheNames = ['def'];
+const cacheNames = ['def2'];
 // 更新缓存时需要保留的大体积静态资源（很少变动，重下代价高）。
 //
 // 原实现有两个 bug，导致这五项里有四项**照样被删**：
@@ -70,8 +87,8 @@ let flag = false;
 
 function update(force = false) {
   return caches.keys().then(keys => {
-    if (!keys.includes('def')) return;
-    return caches.open('def').then(cc => {
+    if (!keys.includes(CACHE)) return;
+    return caches.open(CACHE).then(cc => {
       return cc.keys().then(keys => {
         return Promise.all(keys.map(k => {
           if (force || !isProtected(k.url)) {
@@ -92,7 +109,13 @@ this.addEventListener('message', function (e) {
   }
 });
 this.addEventListener('activate', function (event) {
-  event.waitUntil(update(false));
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+      )
+    ).then(() => update(false))
+  );
 });
 
 // let dongtai=[
