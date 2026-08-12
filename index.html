@@ -7,20 +7,17 @@
   <title>Win12 网页版</title>
   <script>
     (function () {
-       const h = location.hostname;
-       const isLocal = ['localhost', '127.0.0.1', '::1', ''].includes(h);
-      const isNetlify = h.endsWith('.netlify.app');
-      window.redirectUrl = isLocal || isNetlify ? './boot.html' : 'https://win12-online.github.io';
+      window.redirectUrl = './boot.html';
       location.replace(window.redirectUrl);
     })();
   </script>
   <noscript>
-    <meta http-equiv="refresh" content="0; url=https://win12-online.github.io">
+    <meta http-equiv="refresh" content="0; url=./boot.html">
   </noscript>
 </head>
 
 <body>
-  <p>正在跳转到 <a id="redirect-link" href="https://win12-online.github.io">https://win12-online.github.io</a> …</p>
+  <p>正在跳转到 <a id="redirect-link" href="./boot.html">./boot.html</a> …</p>
   <p><a href="./boot.html">如果没有自动跳转，点这里进入本地版本</a></p>
   <script>
     const redirectLink = document.getElementById('redirect-link');
